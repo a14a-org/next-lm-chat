@@ -1,26 +1,950 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Colors */
+  --background-start: #FFF0F5; /* Soft pink */
+  --background-end: #F5F0FF; /* Lavender */
+  --foreground: #333333; /* UI Dark Charcoal */
+  
+  /* Brand Colors */
+  --accent: #F39880; /* Coral/Salmon accent - adjusted to match screenshot */
+  --accent-soft: rgba(243, 152, 128, 0.2); /* Soft coral for backgrounds */
+  --purple-soft: rgba(138, 116, 191, 0.12); /* Soft purple for user message backgrounds */
+  --purple-medium: #8a74bf; /* Medium purple for accents */
+  --ui-light: #F9F9F9; /* Off-white */
+  --ui-dark: #333333; /* Charcoal */
+  
+  /* Functional Colors */
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #F44336;
+  --info: #2196F3;
+  
+  /* Component Colors */
+  --card-bg: rgba(255, 255, 255, 0.95); /* Light card background for light mode */
+  --user-message-bg: rgba(147, 112, 219, 0.5); /* Darker purple for better contrast */
+  --user-message-text: #FFFFFF; /* White text for user messages */
+  --user-message-border: rgba(147, 112, 219, 0.6); /* More visible purple border */
+  --bot-message-bg: #FFFFFF; /* White background */
+  --bot-message-text: #333333; /* Dark text for readability */
+  --bot-message-border: rgba(138, 116, 191, 0.2); /* Subtle purple border */
+  --thinking-bg: #9370DB; /* Use purple for thinking label */
+  --thinking-text: #ffffff; /* White text for thinking label */
+  --thinking-content-bg: rgba(51, 51, 51, 0.9); /* Dark background for thinking content */
+  --thinking-content-text: #e0e0e0; /* Light text for thinking content */
+  --thinking-content-border: rgba(147, 112, 219, 0.2); /* Subtle purple border */
+  
+  /* UI Properties */
+  --card-border-radius: 16px;
+  --button-border-radius-primary: 24px;
+  --button-border-radius-secondary: 12px;
+  --message-user-border-radius: 16px 16px 0px 16px;
+  --message-ai-border-radius: 16px 16px 16px 0px;
+  --input-border-radius: 28px;
+  --card-shadow: 0px 2px 8px rgba(0, 0, 0, 0.03);
+  --message-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  --input-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+  --transition-speed: 0.3s;
+  
+  /* Theme Transition */
+  --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode theme */
+html.dark {
+  /* Core Colors */
+  --background-start: #0f1117; /* Very dark blue/black */
+  --background-end: #151924; /* Dark blue-gray */
+  --foreground: #e1e1e1; /* Light gray text */
+  
+  /* Brand Colors */
+  --accent: #F39880; /* Keep the same accent color for brand consistency */
+  --accent-soft: rgba(243, 152, 128, 0.3); /* Slightly stronger for dark mode */
+  --purple-soft: rgba(138, 116, 191, 0.25); /* Slightly stronger purple for dark backgrounds */
+  --purple-medium: #9d86d9; /* Brighter purple for dark mode */
+  --ui-light: #2a2a3a; /* Dark gray replacing off-white */
+  --ui-dark: #e1e1e1; /* Light gray replacing charcoal */
+  
+  /* Component Colors */
+  --card-bg: rgba(30, 30, 41, 0.95);
+  
+  /* Message styling for dark mode - updated for better contrast */
+  --user-message-bg: rgba(147, 112, 219, 0.7); /* Stronger purple for user messages */
+  --user-message-text: #FFFFFF; /* Keep white text for user messages */
+  --user-message-border: rgba(147, 112, 219, 0.8); /* Stronger border */
+  
+  --bot-message-bg: #1e1e29; /* Solid dark background matching screenshot */
+  --bot-message-text: #e1e1e1; /* Light text for dark background */
+  --bot-message-border: #2a2a35; /* Darker border */
+  
+  /* Thinking section styling */
+  --thinking-bg: #10b981; /* Green dot color */
+  --thinking-text: #e1e1e1; /* Light text */
+  --thinking-content-bg: #181820; /* Dark background for thinking content */
+  --thinking-content-text: #e1e1e1; /* Light text */
+  --thinking-content-border: #2a2a35; /* Dark border */
+  
+  /* UI Properties - shadows need to be darker for dark mode */
+  --card-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+  --message-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3); /* Stronger shadow for more depth */
+  --input-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--background-start);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Add html background style to ensure proper light/dark mode display */
+html {
+  background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+  transition: var(--theme-transition);
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+  font-family: var(--font-sans, 'Inter', 'SF Pro Display', Arial, sans-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  transition: var(--theme-transition);
 }
+
+/* Typography */
+h1 {
+  font-size: 28px;
+  font-weight: 400;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #8F8F8F;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+  color: #717171;
+}
+
+/* Utility classes */
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 95%, rgba(138, 116, 191, 0.2) 95%);
+  background-size: 200% 200%;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: translateY(101%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+}
+
+.card:hover::before {
+  transform: translateY(0);
+  opacity: 1;
+  animation: card-gradient-flow 2s ease infinite;
+}
+
+@keyframes card-gradient-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+.btn {
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s ease;
+  z-index: -1;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+  border-radius: var(--button-border-radius-primary);
+  border: none;
+  position: relative;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 12px rgba(243, 152, 128, 0.2);
+}
+
+.btn-primary:hover {
+  opacity: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(243, 152, 128, 0.25);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: var(--button-border-radius-primary);
+  background: linear-gradient(45deg, var(--accent), rgba(138, 116, 191, 0.8), var(--accent));
+  background-size: 200% 200%;
+  z-index: -1;
+  animation: btn-primary-border 3s ease infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+@keyframes btn-primary-border {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--ui-dark);
+  border: 1px solid #E0E0E0;
+  border-radius: var(--button-border-radius-secondary);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: var(--purple-medium);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(138, 116, 191, 0.1);
+}
+
+.btn-secondary::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(138, 116, 191, 0.2);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.6s ease-out;
+  z-index: -1;
+}
+
+.btn-secondary:active::after {
+  transform: translate(-50%, -50%) scale(20);
+  opacity: 0;
+  transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+}
+
+.input {
+  border-radius: var(--input-border-radius);
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  box-shadow: var(--input-shadow);
+  background-color: white;
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(243, 152, 128, 0.3);
+  box-shadow: 0 0 0 3px rgba(243, 152, 128, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Input wrapper with magical effects */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: calc(var(--input-border-radius) + 3px);
+  background: linear-gradient(90deg, rgba(243, 152, 128, 0.5), rgba(138, 116, 191, 0.5), rgba(243, 152, 128, 0.5));
+  background-size: 200% 100%;
+  opacity: 0;
+  filter: blur(8px);
+  z-index: -1;
+  transition: all 0.4s ease;
+  animation: input-gradient-shift 4s ease infinite;
+}
+
+@keyframes input-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.input-wrapper:focus-within::after {
+  opacity: 0.7;
+}
+
+/* Animation utilities */
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(147, 112, 219, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(147, 112, 219, 0.1);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out 0.5s forwards;
+}
+
+@keyframes card-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-100px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes float-around {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(10px, -15px);
+  }
+  50% {
+    transform: translate(-5px, -25px);
+  }
+  75% {
+    transform: translate(-15px, -5px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes pulse-opacity {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.5s cubic-bezier(0.26, 1.36, 0.5, 1.2) forwards;
+}
+
+@keyframes fade-rotate-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-15deg);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1) rotate(0);
+  }
+}
+
+.animate-fade-rotate-in {
+  animation: fade-rotate-in 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+/* Message Bubbles */
+.message-bubble {
+  padding: 16px;
+  max-width: 85%;
+  margin-bottom: 10px;
+  box-shadow: var(--message-shadow);
+  font-size: 16px;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes message-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    filter: blur(3px);
+  }
+  80% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.user-message {
+  background-color: var(--user-message-bg);
+  color: var(--user-message-text);
+  border-radius: var(--message-user-border-radius);
+  margin-left: auto;
+  border: 1px solid var(--user-message-border);
+  box-shadow: 0px 3px 10px rgba(147, 112, 219, 0.2);
+  background-image: linear-gradient(to bottom right, #9370DB, #7C5CB8);
+  text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  position: relative;
+}
+
+/* Add dark mode override for user messages */
+html.dark .user-message {
+  background-image: linear-gradient(to bottom right, #6366F1, #4F46E5);
+  border-color: #4F46E5;
+  box-shadow: 0px 3px 10px rgba(99, 102, 241, 0.3);
+}
+
+.user-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%);
+  background-size: 200% 200%;
+  opacity: 0;
+  border-radius: var(--message-user-border-radius);
+  pointer-events: none;
+}
+
+@keyframes user-message-shimmer {
+  0% {
+    background-position: 200% 0;
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 0 0;
+    opacity: 0;
+  }
+}
+
+.ai-message {
+  background-color: var(--bot-message-bg);
+  color: var(--bot-message-text);
+  border-radius: var(--message-ai-border-radius);
+  margin-right: auto;
+  border: 1px solid var(--bot-message-border);
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(to bottom right, #FFFFFF, #F8F8FF);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Override background for dark mode */
+html.dark .ai-message {
+  background: var(--bot-message-bg);
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
+  border-color: var(--bot-message-border);
+}
+
+.ai-message::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(138, 116, 191, 0.08) 0%, transparent 70%, transparent 100%);
+  opacity: 0;
+  animation: ai-message-glow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ai-message-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Typing cursor animation */
+.typing-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 18px;
+  background-color: var(--purple-medium);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: typing-cursor-blink 0.7s infinite;
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+@keyframes typing-cursor-blink {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Enhanced thinking block styles for dark mode */
+.thinking-block {
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #eaeaea;
+}
+
+html.dark .thinking-block {
+  background-color: #1e1e29;
+  border-color: #2a2a35;
+  color: #e1e1e1;
+}
+
+.thinking-block:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+html.dark .thinking-block:hover {
+  background-color: #252532;
+}
+
+.thinking-block span {
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #333333; /* Adding dark text color for light mode */
+}
+
+.thinking-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 0;
+  margin-top: 0;
+}
+
+.thinking-content.expanded {
+  max-height: 80vh;
+  overflow-y: auto;
+  opacity: 1;
+}
+
+.thinking-box {
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid #eaeaea;
+  border-top: none;
+  border-radius: 0 0 0.75rem 0.75rem;
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #333333;
+}
+
+html.dark .thinking-box {
+  background-color: #181820;
+  color: #e1e1e1;
+  border: 1px solid #2a2a35;
+  border-top: none;
+}
+
+.thinking-in-progress span::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: thinking-pulse 1.5s infinite ease-in-out;
+}
+
+.thinking-completed span::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+@keyframes thinking-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+/* Neural network visualization */
+.neural-network {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.neuron {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(147, 112, 219, 0.6);
+  box-shadow: 0 0 5px rgba(147, 112, 219, 0.4);
+}
+
+.synapse {
+  position: absolute;
+  height: 1px;
+  background-color: rgba(147, 112, 219, 0.2);
+  transform-origin: left center;
+  animation: synapse-pulse 3s infinite;
+}
+
+@keyframes synapse-pulse {
+  0% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+
+/* Emoji Integration */
+.emoji {
+  display: inline-block;
+  font-size: 1.2em;
+  line-height: 1;
+  vertical-align: middle;
+  margin: 0 0.05em;
+}
+
+/* Markdown styling */
+.markdown-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.markdown-content p {
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.markdown-content ul, .markdown-content ol {
+  margin-left: 1.25rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.2rem;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-bottom: 0.1rem;
+  padding-left: 0.2rem;
+}
+
+.markdown-content li > p {
+  margin-bottom: 0.1rem;
+}
+
+.markdown-content a {
+  color: var(--purple-medium);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--purple-medium);
+}
+
+.markdown-content a:hover {
+  border-bottom: 1px solid var(--purple-medium);
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--purple-soft);
+  padding-left: 0.75rem;
+  margin: 0.2rem 0;
+  color: #666;
+  font-style: italic;
+}
+
+.markdown-content code {
+  font-family: var(--font-mono, monospace);
+  background-color: rgba(138, 116, 191, 0.08);
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.markdown-content pre {
+  background-color: rgba(138, 116, 191, 0.08);
+  padding: 0.35rem;
+  border-radius: 5px;
+  margin: 0.2rem 0;
+  overflow-x: auto;
+  font-size: 0.85em;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  display: block;
+  line-height: 1.3;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 0.2rem 0;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid rgba(138, 116, 191, 0.2);
+  margin: 0.25rem 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.2rem 0;
+}
+
+.markdown-content th, .markdown-content td {
+  border: 1px solid rgba(138, 116, 191, 0.2);
+  padding: 0.2rem 0.4rem;
+}
+
+.markdown-content th {
+  background-color: rgba(138, 116, 191, 0.05);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .message-bubble {
+    max-width: 90%;
+  }
+}
+
+/* Add styles for user message content */
+.user-message-content {
+  line-height: 1.2;
+}
+
+.user-message-content p {
+  margin-bottom: 0.15rem;
+}
+
+/* Add compact markdown class for tighter spacing */
+.markdown-content {
+  line-height: 1.2;
+}
+
+.markdown-content h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0.3rem;
+  margin-bottom: 0.15rem;
+}
+
+.markdown-content p {
+  margin-bottom: 0.2rem;
+  line-height: 1.25;
+}
+
+/* Other markdown styles remain unchanged */
+
