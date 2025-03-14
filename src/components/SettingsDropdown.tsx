@@ -104,6 +104,8 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
             right: 0,
             top: '100%',
+            maxHeight: '400px', // P45d2
+            overflowY: 'auto', // P6046
           }}
         >
           <div className="p-6">
