@@ -176,6 +176,8 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
           style={{
             backgroundColor: theme === 'light' ? 'white' : '#1e1e29',
             borderColor: theme === 'light' ? '#e5e7eb' : '#374151',
+            maxHeight: '300px', // P6425
+            overflowY: 'auto', // Pec44
           }}
           role="listbox"
           aria-labelledby="model-selector"
