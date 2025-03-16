@@ -49,6 +49,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, loading = false }) 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const [newContentAvailable, setNewContentAvailable] = useState(false);
+  const [newContentSeen, setNewContentSeen] = useState(true);
   const lastMessagesLengthRef = useRef(messages.length);
   const lastContentLengthRef = useRef(messages[messages.length - 1]?.content.length || 0);
   const lastScrollPositionRef = useRef(0);
@@ -161,6 +162,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages, loading = false }) 
         setAutoScrollEnabled(true);
         // Direct update for user action
         handleUserInitiatedContentUpdate(false);
+        // Reset content seen state when user sends a message
+        setNewContentSeen(false);
       }
     }
 
@@ -244,7 +247,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, loading = false }) 
       </div>
 
       {/* New content indicator */}
-      {newContentAvailable && (
+      {newContentAvailable && !newContentSeen && (
         <div
           className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[var(--purple-medium)] dark:bg-[#10b981] text-white px-4 py-2 rounded-full shadow-md cursor-pointer z-10 flex items-center space-x-1 animate-fade-in"
           onClick={() => {
@@ -252,6 +255,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages, loading = false }) 
             // Direct update for user action
             handleUserInitiatedContentUpdate(false);
             scrollToBottom('smooth');
+            // Mark new content as seen
+            setNewContentSeen(true);
           }}
         >
           <span>New content</span>

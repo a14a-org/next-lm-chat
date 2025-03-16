@@ -563,6 +563,22 @@ html.dark .action-button:hover:not(:disabled) {
   border-radius: var(--input-border-radius);
 }
 
+/* Message container to contain both message and copy button */
+.message-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  animation: message-fade-in 0.5s ease-out;
+}
+
+.user-message-container {
+  align-items: flex-end;
+}
+
+.ai-message-container {
+  align-items: flex-start;
+}
+
 @keyframes message-fade-in {
   0% {
     opacity: 0;

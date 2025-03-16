@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { Message as MessageType } from '../types';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown, FiCheck, FiCopy } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -55,6 +55,8 @@ const Message: React.FC<MessageProps> = ({ message }) => {
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const thinkingRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+  const [showCopyButton, setShowCopyButton] = useState(false);
 
   // Check if thinking is complete (has both opening and closing think tags)
   const isThinkingComplete =
@@ -76,6 +78,41 @@ const Message: React.FC<MessageProps> = ({ message }) => {
       thinkingRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [isThinkingExpanded]);
+
+  // Show copy button after 1 second for assistant messages
+  useEffect(() => {
+    if (!isUser) {
+      const timer = setTimeout(() => {
+        setShowCopyButton(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isUser]);
+
+  const copyToClipboard = () => {
+    // Get message content without thinking tags
+    let textToCopy = message.content;
+
+    // If it has thinking content, extract only the response part
+    if (!isUser && message.content.includes('<think>') && message.content.includes('</think>')) {
+      const thinkingMatch = message.content.match(/<think>([\s\S]*?)<\/think>([\s\S]*)/);
+      if (thinkingMatch && thinkingMatch[2]) {
+        textToCopy = thinkingMatch[2].trim();
+      }
+    }
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+  };
 
   const renderMessageContent = () => {
     const mainContent = (
@@ -215,8 +252,34 @@ const Message: React.FC<MessageProps> = ({ message }) => {
 
   return (
     <>
-      <div className={`message-bubble ${isUser ? 'user-message' : 'ai-message'}`}>
-        {renderMessageContent()}
+      <div
+        className={`message-container relative ${isUser ? 'user-message-container' : 'ai-message-container'}`}
+      >
+        <div className={`message-bubble ${isUser ? 'user-message' : 'ai-message'}`}>
+          {renderMessageContent()}
+        </div>
+
+        {!isUser && showCopyButton && (
+          <div className="flex justify-end mt-1">
+            <button
+              onClick={copyToClipboard}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center text-xs transition-colors duration-200 ease-in-out"
+              aria-label="Copy message to clipboard"
+            >
+              {copied ? (
+                <>
+                  <FiCheck className="mr-1" size={14} />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <FiCopy className="mr-1" size={14} />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Image Modal */}
