@@ -1,6 +1,13 @@
 import axios from 'axios';
-import { ChatCompletionRequest, CompletionRequest, EmbeddingRequest, Model } from '../types';
+import type {
+  ChatCompletionRequest,
+  CompletionRequest,
+  EmbeddingRequest,
+  Model,
+} from '../types/index';
+import type { ApiMessage, MessageContent } from '../types';
 import { stripThinkTags } from './helpers';
+import { ImageData } from './image-processing';
 
 // Create axios instance with base URL pointing to our Next.js API routes
 const apiClient = axios.create({
@@ -48,31 +55,73 @@ export const getModels = async (): Promise<Model[]> => {
   }
 };
 
+const formatMessageWithImages = (message: {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  images?: ImageData[];
+}): ApiMessage => {
+  const content: MessageContent[] = [];
+
+  // Add text content
+  if (message.content) {
+    content.push({
+      type: 'text',
+      text: message.content,
+    });
+  }
+
+  // Add images if present
+  if (message.images && message.images.length > 0) {
+    message.images.forEach((img: ImageData) => {
+      content.push({
+        type: 'image_url',
+        image_url: {
+          url: img.data,
+        },
+      });
+    });
+  }
+
+  return {
+    role: message.role,
+    content,
+  };
+};
+
+const validateTokenLimit = (maxTokens: number): number => {
+  const MIN_TOKENS = 1;
+  const MAX_TOKENS = 32768;
+  return Math.min(Math.max(maxTokens, MIN_TOKENS), MAX_TOKENS);
+};
+
 /**
  * Create a chat completion
  */
 export const createChatCompletion = async (request: ChatCompletionRequest) => {
   try {
-    // Process each assistant message to remove <think> tags before sending to API
-    const processedMessages = request.messages.map(message => {
+    // Process each message to handle images and remove think tags
+    const processedMessages: ApiMessage[] = request.messages.map(message => {
       if (message.role === 'assistant') {
         return {
-          ...message,
+          role: message.role,
           content: stripThinkTags(message.content),
         };
       }
-      return message;
+      return formatMessageWithImages(message);
     });
+
+    // Validate and adjust max_tokens if needed
+    const validatedMaxTokens = validateTokenLimit(request.max_tokens || 4096);
 
     // Create a new request object with processed messages
     const processedRequest = {
       ...request,
       messages: processedMessages,
+      max_tokens: validatedMaxTokens,
     };
 
     // Handle streaming response
     if (request.stream) {
-      // Use fetch instead of axios for streaming
       const response = await fetch('/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -90,7 +139,7 @@ export const createChatCompletion = async (request: ChatCompletionRequest) => {
       return response;
     }
 
-    // Regular (non-streaming) response with axios
+    // Regular response
     const response = await apiClient.post('/chat/completions', processedRequest);
     return response.data;
   } catch (error) {

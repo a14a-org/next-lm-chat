@@ -38,8 +38,10 @@ export const validateConfig = (): { valid: boolean; errors: string[] } => {
   };
 };
 
-export default {
+const CONFIG = {
   api: API_CONFIG,
   app: APP_CONFIG,
   validateConfig,
 };
+
+export default CONFIG;

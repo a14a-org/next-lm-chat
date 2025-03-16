@@ -3,13 +3,19 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import WelcomeScreen from './WelcomeScreen';
 import SettingsPortal from './SettingsPortal';
-import { Message, Model } from '../types';
+import { Message } from '../types';
+import type { Model } from '../types/index';
 import { createMessage } from '../utils/helpers';
 import { createChatCompletion, getModels } from '../utils/api-client';
 import { APP_CONFIG } from '../utils/config';
+import { ImageData } from '../utils/image-processing';
+import { trackMessageSent, trackModelChanged } from '../utils/analytics';
 
 const LOCAL_STORAGE_MODEL_KEY = 'next-lm-chat-selected-model';
-const DEFAULT_MAX_TOKENS = 2048;
+const LOCAL_STORAGE_MAX_TOKENS_KEY = 'next-lm-chat-max-tokens';
+const LOCAL_STORAGE_SYSTEM_MESSAGE_ENABLED_KEY = 'next-lm-chat-system-message-enabled';
+const LOCAL_STORAGE_SYSTEM_MESSAGE_CONTENT_KEY = 'next-lm-chat-system-message-content';
+const DEFAULT_MAX_TOKENS = 4096;
 
 const ChatContainer: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,6 +27,8 @@ const ChatContainer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState<boolean>(true);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [systemMessageEnabled, setSystemMessageEnabled] = useState<boolean>(false);
+  const [systemMessageContent, setSystemMessageContent] = useState<string>('');
 
   // Fetch available models on component mount
   useEffect(() => {
@@ -57,18 +65,46 @@ const ChatContainer: React.FC = () => {
     fetchModels();
   }, []);
 
+  // Load saved max tokens and system message settings on mount
+  useEffect(() => {
+    const savedMaxTokens = localStorage.getItem(LOCAL_STORAGE_MAX_TOKENS_KEY);
+    if (savedMaxTokens) {
+      const parsedValue = parseInt(savedMaxTokens, 10);
+      if (!isNaN(parsedValue)) {
+        setMaxTokens(parsedValue);
+      }
+    }
+
+    const savedSystemMessageEnabled = localStorage.getItem(
+      LOCAL_STORAGE_SYSTEM_MESSAGE_ENABLED_KEY
+    );
+    if (savedSystemMessageEnabled) {
+      setSystemMessageEnabled(savedSystemMessageEnabled === 'true');
+    }
+
+    const savedSystemMessageContent = localStorage.getItem(
+      LOCAL_STORAGE_SYSTEM_MESSAGE_CONTENT_KEY
+    );
+    if (savedSystemMessageContent) {
+      setSystemMessageContent(savedSystemMessageContent);
+    }
+  }, []);
+
   // When messages change, update welcome screen visibility
   useEffect(() => {
     setShowWelcome(messages.length === 0);
   }, [messages]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, images?: ImageData[]) => {
     try {
       setError(null);
       setLoading(true);
 
+      // Track message sent
+      trackMessageSent(selectedModel, !!images);
+
       // Create and add user message
-      const userMessage = createMessage('user', content);
+      const userMessage = createMessage('user', content, images);
       setMessages(prevMessages => [...prevMessages, userMessage]);
 
       // Reset any previous streaming state
@@ -76,15 +112,25 @@ const ChatContainer: React.FC = () => {
 
       try {
         // Prepare messages for API
-        const messagesToSend = messages.concat(userMessage).map(({ role, content }) => ({
+        const messagesToSend = messages.concat(userMessage).map(({ role, content, images }) => ({
           role,
           content,
+          images,
         }));
+
+        // Add system message if enabled
+        if (systemMessageEnabled && systemMessageContent.trim()) {
+          messagesToSend.unshift({
+            role: 'system',
+            content: systemMessageContent.trim(),
+            images: undefined,
+          });
+        }
 
         // Send request to API with streaming enabled
         const response = await createChatCompletion({
           model: selectedModel,
-          messages: messagesToSend,
+          messages: messagesToSend as Message[],
           stream: true,
           max_tokens: maxTokens,
         });
@@ -348,23 +394,36 @@ const ChatContainer: React.FC = () => {
         setIsStreaming(false);
       }
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('Error in message handling:', err);
       setLoading(false);
-      setError('Failed to send message. Please try again.');
+      setError('An error occurred while processing your message.');
       setIsStreaming(false);
     }
   };
 
   const handleSelectModel = (modelId: string) => {
     setSelectedModel(modelId);
+    // Track model change
+    trackModelChanged(modelId);
   };
 
   const handleChangeMaxTokens = (value: number) => {
     setMaxTokens(value);
+    localStorage.setItem(LOCAL_STORAGE_MAX_TOKENS_KEY, value.toString());
+  };
+
+  const handleToggleSystemMessage = (enabled: boolean) => {
+    setSystemMessageEnabled(enabled);
+    localStorage.setItem(LOCAL_STORAGE_SYSTEM_MESSAGE_ENABLED_KEY, enabled.toString());
+  };
+
+  const handleChangeSystemMessageContent = (content: string) => {
+    setSystemMessageContent(content);
+    localStorage.setItem(LOCAL_STORAGE_SYSTEM_MESSAGE_CONTENT_KEY, content);
   };
 
   return (
-    <div className="flex flex-col h-full max-w-5xl mx-auto w-full">
+    <div className="flex flex-col h-full max-w-5xl mx-auto w-full relative">
       {/* Settings Portal renders outside of this component hierarchy */}
       <SettingsPortal
         models={models}
@@ -372,6 +431,10 @@ const ChatContainer: React.FC = () => {
         onSelectModel={handleSelectModel}
         maxTokens={maxTokens}
         onChangeMaxTokens={handleChangeMaxTokens}
+        systemMessageEnabled={systemMessageEnabled}
+        onToggleSystemMessage={handleToggleSystemMessage}
+        systemMessageContent={systemMessageContent}
+        onChangeSystemMessageContent={handleChangeSystemMessageContent}
         disabled={loading || isStreaming}
         isLoading={loadingModels}
       />
@@ -382,18 +445,18 @@ const ChatContainer: React.FC = () => {
         </div>
       )}
 
-      <div className="flex-grow flex flex-col overflow-hidden w-full">
+      <div className="flex-grow flex flex-col overflow-hidden w-full pb-24">
         {showWelcome ? (
           <WelcomeScreen onStartChat={handleSendMessage} />
         ) : (
           <div className="w-full max-w-4xl mx-auto flex-grow">
-            <MessageList messages={messages} loading={loading} isStreaming={isStreaming} />
+            <MessageList messages={messages} loading={loading} />
           </div>
         )}
       </div>
 
-      <div className="fixed left-0 right-0 bottom-[10%] flex justify-center">
-        <div className="max-w-3xl w-full px-4">
+      <div className="fixed left-0 right-0 bottom-0 flex justify-center pointer-events-none px-2 pb-4 bg-gradient-to-t from-[rgba(0,0,0,0.1)] to-transparent dark:from-[rgba(0,0,0,0.2)]">
+        <div className="max-w-3xl w-full px-2 sm:px-4 pointer-events-auto">
           <MessageInput onSendMessage={handleSendMessage} disabled={loading} />
         </div>
       </div>

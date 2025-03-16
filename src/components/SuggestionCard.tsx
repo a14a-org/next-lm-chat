@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { FaPaperPlane, FaHandPaper, FaMagic } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 
@@ -12,7 +12,6 @@ interface SuggestionCardProps {
 }
 
 const SuggestionCard: React.FC<SuggestionCardProps> = ({ icon, title, subtitle, onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const { theme } = useTheme();
 
   const getIcon = () => {
@@ -38,10 +37,8 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ icon, title, subtitle, 
 
   return (
     <div
-      className="group rounded-2xl p-6 cursor-pointer transition-all duration-300 relative overflow-hidden"
+      className="group rounded-2xl p-4 md:p-6 cursor-pointer transition-all duration-300 relative overflow-hidden"
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       style={{
         backgroundColor: theme === 'light' ? 'white' : '#1e1e29',
         boxShadow:
@@ -50,7 +47,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ icon, title, subtitle, 
     >
       {/* Icon Circle */}
       <div
-        className="w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4"
+        className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl mb-3 md:mb-4"
         style={{
           backgroundColor:
             theme === 'light' ? 'rgba(243, 152, 128, 0.15)' : 'rgba(243, 152, 128, 0.2)',
@@ -62,12 +59,15 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ icon, title, subtitle, 
 
       {/* Title and Subtitle */}
       <h3
-        className="text-lg font-semibold mb-2"
+        className="text-base md:text-lg font-semibold mb-1 md:mb-2 line-clamp-1"
         style={{ color: theme === 'light' ? '#111827' : '#f3f4f6' }}
       >
         {title}
       </h3>
-      <p className="text-sm" style={{ color: theme === 'light' ? '#4b5563' : '#d1d5db' }}>
+      <p
+        className="text-xs md:text-sm line-clamp-1"
+        style={{ color: theme === 'light' ? '#4b5563' : '#d1d5db' }}
+      >
         {subtitle}
       </p>
 

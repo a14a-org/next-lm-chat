@@ -1,3 +1,6 @@
+import { Message } from '../types';
+import { ImageData } from './image-processing';
+
 /**
  * Generates a unique ID for messages, conversations, etc.
  */
@@ -28,15 +31,19 @@ export const truncateString = (str: string, length: number): string => {
  * Creates a new chat message
  * @param role - 'user', 'assistant', or 'system'
  * @param content - The message content
+ * @param images - Optional images associated with the message
  */
-export const createMessage = (role: 'user' | 'assistant' | 'system', content: string) => {
-  return {
-    id: generateId(),
-    role,
-    content,
-    timestamp: Date.now(),
-  };
-};
+export const createMessage = (
+  role: 'user' | 'assistant' | 'system',
+  content: string,
+  images?: ImageData[]
+): Message => ({
+  id: generateId(),
+  role,
+  content,
+  images,
+  timestamp: Date.now(),
+});
 
 /**
  * Removes <think>...</think> tags and their content from message content

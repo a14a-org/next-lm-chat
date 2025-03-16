@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSettings, FiSun, FiMoon } from 'react-icons/fi';
+import { FiSettings, FiSun, FiMoon, FiInfo } from 'react-icons/fi';
 import ModelSelector from './ModelSelector';
 import MaxTokensSelector from './MaxTokensSelector';
-import { Model } from '../types';
+import type { Model } from '../types/index';
 import { useTheme } from '../context/ThemeContext';
+import { trackSettingsOpened, trackSettingsChanged, trackThemeChanged } from '../utils/analytics';
 
 interface SettingsDropdownProps {
   models: Model[];
@@ -11,6 +12,10 @@ interface SettingsDropdownProps {
   onSelectModel: (modelId: string) => void;
   maxTokens: number;
   onChangeMaxTokens: (value: number) => void;
+  systemMessageEnabled: boolean;
+  onToggleSystemMessage: (enabled: boolean) => void;
+  systemMessageContent: string;
+  onChangeSystemMessageContent: (content: string) => void;
   isLoading?: boolean;
   disabled?: boolean;
 }
@@ -23,6 +28,10 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
   onSelectModel,
   maxTokens,
   onChangeMaxTokens,
+  systemMessageEnabled,
+  onToggleSystemMessage,
+  systemMessageContent,
+  onChangeSystemMessageContent,
   isLoading = false,
   disabled = false,
 }) => {
@@ -72,7 +81,32 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
+      if (!isOpen) {
+        trackSettingsOpened();
+      }
     }
+  };
+
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    toggleTheme();
+    trackThemeChanged(newTheme);
+  };
+
+  const handleMaxTokensChange = (value: number) => {
+    onChangeMaxTokens(value);
+    trackSettingsChanged('max_tokens', value);
+    localStorage.setItem(LOCAL_STORAGE_MAX_TOKENS_KEY, value.toString());
+  };
+
+  const handleToggleSystemMessage = () => {
+    onToggleSystemMessage(!systemMessageEnabled);
+    trackSettingsChanged('system_message_enabled', !systemMessageEnabled);
+  };
+
+  const handleSystemMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChangeSystemMessageContent(e.target.value);
+    trackSettingsChanged('system_message_content', 'updated');
   };
 
   return (
@@ -104,8 +138,8 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
             right: 0,
             top: '100%',
-            maxHeight: '400px', // P45d2
-            overflowY: 'auto', // P6046
+            maxHeight: '600px', // Increased from 400px to 600px to accommodate dropdowns inside
+            overflowY: 'auto',
           }}
         >
           <div className="p-6">
@@ -132,7 +166,7 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
                   {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
                 </span>
                 <button
-                  onClick={toggleTheme}
+                  onClick={handleThemeToggle}
                   className="p-2 rounded-full transition-colors"
                   style={{
                     backgroundColor: theme === 'light' ? '#f3f4f6' : '#374151',
@@ -167,13 +201,70 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
             </div>
 
             {/* Max Tokens Selection */}
+            <div className="mb-6">
+              <MaxTokensSelector maxTokens={maxTokens} onChangeMaxTokens={handleMaxTokensChange} />
+            </div>
+
+            {/* System Message Section */}
             <div>
-              <MaxTokensSelector
-                maxTokens={maxTokens}
-                onChangeMaxTokens={onChangeMaxTokens}
-                minTokens={16}
-                maxPossibleTokens={4096}
-              />
+              <label
+                className="block text-base font-medium mb-3"
+                style={{ color: theme === 'light' ? '#111827' : '#d1d5db' }}
+              >
+                <div className="flex items-center">
+                  <span>System Message</span>
+                  <div className="relative inline-block ml-2 group">
+                    <FiInfo className="w-4 h-4 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400 cursor-help" />
+                    <div className="absolute left-1/2 bottom-full mb-2 -translate-x-1/2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 w-64 p-2 rounded bg-gray-800 text-white text-xs shadow-lg z-50">
+                      <div className="relative">
+                        A system message helps set the behavior of the assistant. It provides
+                        initial instructions that guide the AI&apos;s responses.
+                        <div className="absolute w-2 h-2 bg-gray-800 transform rotate-45 left-1/2 bottom-0 translate-y-1/2 -translate-x-1/2"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </label>
+              <div className="flex items-center justify-between mb-3">
+                <span
+                  className="text-sm"
+                  style={{ color: theme === 'light' ? '#4b5563' : '#9ca3af' }}
+                >
+                  {systemMessageEnabled ? 'Enabled' : 'Disabled'}
+                </span>
+                <button
+                  onClick={handleToggleSystemMessage}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    systemMessageEnabled
+                      ? 'bg-[#F39880]'
+                      : theme === 'light'
+                        ? 'bg-gray-200'
+                        : 'bg-gray-700'
+                  }`}
+                  aria-pressed={systemMessageEnabled}
+                  aria-label="Toggle system message"
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      systemMessageEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              {systemMessageEnabled && (
+                <textarea
+                  value={systemMessageContent}
+                  onChange={handleSystemMessageChange}
+                  placeholder="Enter system instructions for the AI..."
+                  rows={4}
+                  className="w-full p-3 rounded-xl border-2 focus:outline-none focus:ring-0 resize-y mb-2"
+                  style={{
+                    backgroundColor: theme === 'light' ? 'white' : '#1e1e29',
+                    color: theme === 'light' ? '#111827' : '#d1d5db',
+                    borderColor: '#F39880',
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

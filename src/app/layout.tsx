@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import ParticleBackground from '../components/ParticleBackground';
 import { ThemeProvider } from '../context/ThemeContext';
+import Script from 'next/script';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,6 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          src="https://analytics.a14a.org/script.js"
+          data-website-id="3ffe85b0-bad7-4843-a33e-a13ee2caa8ac"
+          strategy="lazyOnload"
+        />
+      </head>
       <ThemeProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-[var(--background-start)] to-[var(--background-end)]`}

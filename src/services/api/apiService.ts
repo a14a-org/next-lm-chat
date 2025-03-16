@@ -6,7 +6,7 @@
  */
 
 import { API_CONFIG } from '@/utils/config';
-import { ChatCompletionRequest, CompletionRequest, EmbeddingRequest } from '@/types';
+import { ChatCompletionRequest, CompletionRequest, EmbeddingRequest } from '../../types/index';
 import {
   mockModels,
   generateMockCompletion,

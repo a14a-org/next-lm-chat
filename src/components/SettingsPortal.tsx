@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SettingsDropdown from './SettingsDropdown';
-import { Model } from '../types';
+import type { Model } from '../types/index';
 
 interface SettingsPortalProps {
   models: Model[];
@@ -9,11 +9,27 @@ interface SettingsPortalProps {
   onSelectModel: (modelId: string) => void;
   maxTokens: number;
   onChangeMaxTokens: (value: number) => void;
-  isLoading?: boolean;
+  systemMessageEnabled: boolean;
+  onToggleSystemMessage: (enabled: boolean) => void;
+  systemMessageContent: string;
+  onChangeSystemMessageContent: (content: string) => void;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
-const SettingsPortal: React.FC<SettingsPortalProps> = props => {
+const SettingsPortal: React.FC<SettingsPortalProps> = ({
+  models,
+  selectedModel,
+  onSelectModel,
+  maxTokens,
+  onChangeMaxTokens,
+  systemMessageEnabled,
+  onToggleSystemMessage,
+  systemMessageContent,
+  onChangeSystemMessageContent,
+  disabled = false,
+  isLoading = false,
+}) => {
   // Only run once the component has mounted on the client
   const [mounted, setMounted] = React.useState(false);
 
@@ -45,7 +61,21 @@ const SettingsPortal: React.FC<SettingsPortalProps> = props => {
         transition: 'top 0.3s ease, right 0.3s ease',
       }}
     >
-      <SettingsDropdown {...props} />
+      <div className="settings-portal">
+        <SettingsDropdown
+          models={models}
+          selectedModel={selectedModel}
+          onSelectModel={onSelectModel}
+          maxTokens={maxTokens}
+          onChangeMaxTokens={onChangeMaxTokens}
+          systemMessageEnabled={systemMessageEnabled}
+          onToggleSystemMessage={onToggleSystemMessage}
+          systemMessageContent={systemMessageContent}
+          onChangeSystemMessageContent={onChangeSystemMessageContent}
+          disabled={disabled}
+          isLoading={isLoading}
+        />
+      </div>
     </div>,
     document.body
   );

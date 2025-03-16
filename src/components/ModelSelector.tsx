@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiChevronDown, FiCheck } from 'react-icons/fi';
-import { Model } from '../types';
+import type { Model } from '../types/index';
 import { useTheme } from '../context/ThemeContext';
 
 interface ModelSelectorProps {
@@ -84,25 +84,6 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
     setIsOpen(false);
   };
 
-  // Format model name for better display - split into repository path and model name
-  const formatModelName = (name: string) => {
-    // Split by slashes for better display
-    const parts = name.split(/[\/]/);
-
-    // Get the model name (last part)
-    const modelId = parts[parts.length - 1];
-
-    // Get the repository path (all parts except the last)
-    const repoPath = parts.slice(0, parts.length - 1).join('/');
-
-    return (
-      <div className="flex flex-col">
-        {repoPath && <span className="text-sm text-gray-500">{repoPath}</span>}
-        <span className="text-lg font-medium text-gray-900">{modelId}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -172,12 +153,13 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
 
       {isOpen && (
         <div
-          className="absolute z-10 mt-2 w-full rounded-xl py-2 shadow-lg border"
+          className="absolute z-30 mt-2 w-full rounded-xl py-2 shadow-lg border"
           style={{
             backgroundColor: theme === 'light' ? 'white' : '#1e1e29',
             borderColor: theme === 'light' ? '#e5e7eb' : '#374151',
-            maxHeight: '300px', // P6425
-            overflowY: 'auto', // Pec44
+            maxHeight: '300px',
+            overflowY: 'auto',
+            position: 'relative',
           }}
           role="listbox"
           aria-labelledby="model-selector"

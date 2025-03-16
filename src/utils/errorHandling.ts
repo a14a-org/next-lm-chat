@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { ApiError } from '@/types';
+import type { ApiError } from '../types/index';
 
 /**
  * Error type constants

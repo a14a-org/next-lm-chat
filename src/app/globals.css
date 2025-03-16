@@ -22,12 +22,12 @@
   
   /* Component Colors */
   --card-bg: rgba(255, 255, 255, 0.95); /* Light card background for light mode */
-  --user-message-bg: rgba(147, 112, 219, 0.5); /* Darker purple for better contrast */
-  --user-message-text: #FFFFFF; /* White text for user messages */
-  --user-message-border: rgba(147, 112, 219, 0.6); /* More visible purple border */
-  --bot-message-bg: #FFFFFF; /* White background */
-  --bot-message-text: #333333; /* Dark text for readability */
-  --bot-message-border: rgba(138, 116, 191, 0.2); /* Subtle purple border */
+  --user-message-bg: rgba(243, 152, 128, 0.2); /* Light coral background */
+  --user-message-text: var(--foreground); /* Same as foreground text */
+  --user-message-border: var(--accent); /* Coral border */
+  --bot-message-bg: var(--card-bg); /* White background */
+  --bot-message-text: var(--foreground); /* Same as foreground text */
+  --bot-message-border: rgba(243, 152, 128, 0.15); /* Subtle coral border */
   --thinking-bg: #9370DB; /* Use purple for thinking label */
   --thinking-text: #ffffff; /* White text for thinking label */
   --thinking-content-bg: rgba(51, 51, 51, 0.9); /* Dark background for thinking content */
@@ -38,11 +38,11 @@
   --card-border-radius: 16px;
   --button-border-radius-primary: 24px;
   --button-border-radius-secondary: 12px;
-  --message-user-border-radius: 16px 16px 0px 16px;
-  --message-ai-border-radius: 16px 16px 16px 0px;
+  --message-user-border-radius: var(--input-border-radius); /* Match input radius */
+  --message-ai-border-radius: var(--input-border-radius); /* Match input radius */
   --input-border-radius: 28px;
   --card-shadow: 0px 2px 8px rgba(0, 0, 0, 0.03);
-  --message-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  --message-shadow: 0 4px 10px rgba(243, 152, 128, 0.15); /* Match user bubble shadow */
   --input-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
   --transition-speed: 0.3s;
   
@@ -68,13 +68,13 @@ html.dark {
   /* Component Colors */
   --card-bg: rgba(30, 30, 41, 0.95);
   
-  /* Message styling for dark mode - updated for better contrast */
-  --user-message-bg: rgba(147, 112, 219, 0.7); /* Stronger purple for user messages */
-  --user-message-text: #FFFFFF; /* Keep white text for user messages */
-  --user-message-border: rgba(147, 112, 219, 0.8); /* Stronger border */
+  /* Message styling for dark mode - updated to match new design */
+  --user-message-bg: rgba(243, 152, 128, 0.15); /* Lighter coral for dark mode */
+  --user-message-text: var(--foreground); /* Match foreground text */
+  --user-message-border: var(--accent); /* Coral border */
   
   --bot-message-bg: #1e1e29; /* Solid dark background matching screenshot */
-  --bot-message-text: #e1e1e1; /* Light text for dark background */
+  --bot-message-text: var(--foreground); /* Light text for dark background */
   --bot-message-border: #2a2a35; /* Darker border */
   
   /* Thinking section styling */
@@ -86,7 +86,7 @@ html.dark {
   
   /* UI Properties - shadows need to be darker for dark mode */
   --card-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
-  --message-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3); /* Stronger shadow for more depth */
+  --message-shadow: 0 4px 10px rgba(243, 152, 128, 0.15); /* Match user bubble shadow */
   --input-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -318,39 +318,113 @@ p {
 .input-wrapper {
   position: relative;
   width: 100%;
+  border-radius: var(--input-border-radius);
+  background: var(--card-bg);
+  box-shadow: var(--input-shadow);
+  transition: var(--theme-transition);
+  border: 1px solid transparent;
 }
 
 .input-wrapper::after {
   content: '';
   position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
+  inset: -3px;
   border-radius: calc(var(--input-border-radius) + 3px);
-  background: linear-gradient(90deg, rgba(243, 152, 128, 0.5), rgba(138, 116, 191, 0.5), rgba(243, 152, 128, 0.5));
-  background-size: 200% 100%;
+  background: linear-gradient(90deg, rgba(243, 152, 128, 0.5), rgba(138, 116, 191, 0.5));
   opacity: 0;
   filter: blur(8px);
   z-index: -1;
-  transition: all 0.4s ease;
-  animation: input-gradient-shift 4s ease infinite;
+  transition: opacity 0.4s ease;
 }
 
-@keyframes input-gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.input-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(243, 152, 128, 0.15), var(--input-shadow);
+  transform: translateY(-1px);
 }
 
 .input-wrapper:focus-within::after {
   opacity: 0.7;
+}
+
+.message-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: var(--foreground);
+  font-size: 1rem;
+  transition: var(--theme-transition);
+}
+
+.message-input:focus {
+  outline: none;
+}
+
+.message-input::placeholder {
+  color: var(--foreground);
+  opacity: 0.5;
+}
+
+.action-button {
+  padding: 8px;
+  color: var(--accent);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.action-button:hover:not(:disabled) {
+  background: var(--accent-soft);
+  transform: scale(1.05);
+}
+
+.action-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-preview-grid {
+  margin-top: 1rem;
+  border-radius: var(--input-border-radius);
+  background: var(--card-bg);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--bot-message-border);
+  transition: var(--theme-transition);
+}
+
+.error-message {
+  animation: fade-in 0.3s ease-out;
+  border: 1px solid rgba(244, 67, 54, 0.1);
+}
+
+/* Dark mode overrides */
+html.dark .input-wrapper {
+  background: var(--bot-message-bg);
+  border-color: var(--bot-message-border);
+}
+
+html.dark .message-input::placeholder {
+  color: var(--foreground);
+  opacity: 0.4;
+}
+
+html.dark .action-button {
+  color: var(--purple-medium);
+}
+
+html.dark .action-button:hover:not(:disabled) {
+  background: rgba(138, 116, 191, 0.2);
 }
 
 /* Animation utilities */
@@ -482,11 +556,11 @@ p {
   padding: 16px;
   max-width: 85%;
   margin-bottom: 10px;
-  box-shadow: var(--message-shadow);
   font-size: 16px;
   line-height: 1.4;
   position: relative;
   overflow: hidden;
+  border-radius: var(--input-border-radius);
 }
 
 @keyframes message-fade-in {
@@ -505,23 +579,37 @@ p {
 }
 
 .user-message {
-  background-color: var(--user-message-bg);
-  color: var(--user-message-text);
-  border-radius: var(--message-user-border-radius);
+  background-color: rgba(243, 152, 128, 0.2); /* Light coral/peach background */
+  color: var(--foreground);
   margin-left: auto;
-  border: 1px solid var(--user-message-border);
-  box-shadow: 0px 3px 10px rgba(147, 112, 219, 0.2);
-  background-image: linear-gradient(to bottom right, #9370DB, #7C5CB8);
-  text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
-  font-weight: 500;
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 10px rgba(243, 152, 128, 0.15);
   position: relative;
+}
+
+/* Add the gradient effect */
+.user-message::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(var(--input-border-radius) + 3px);
+  background: linear-gradient(90deg, rgba(243, 152, 128, 0.5), rgba(138, 116, 191, 0.5));
+  opacity: 0.5;
+  filter: blur(8px);
+  z-index: -1;
+  transition: opacity 0.4s ease;
+}
+
+/* Add hover effect */
+.user-message:hover::after {
+  opacity: 0.7;
 }
 
 /* Add dark mode override for user messages */
 html.dark .user-message {
-  background-image: linear-gradient(to bottom right, #6366F1, #4F46E5);
-  border-color: #4F46E5;
-  box-shadow: 0px 3px 10px rgba(99, 102, 241, 0.3);
+  background-color: rgba(243, 152, 128, 0.15);
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px rgba(243, 152, 128, 0.15);
 }
 
 .user-message::before {
@@ -531,10 +619,10 @@ html.dark .user-message {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%);
+  background: linear-gradient(45deg, transparent 50%, rgba(243, 152, 128, 0.1) 50%);
   background-size: 200% 200%;
   opacity: 0;
-  border-radius: var(--message-user-border-radius);
+  border-radius: var(--input-border-radius);
   pointer-events: none;
 }
 
@@ -553,22 +641,23 @@ html.dark .user-message {
 }
 
 .ai-message {
-  background-color: var(--bot-message-bg);
-  color: var(--bot-message-text);
-  border-radius: var(--message-ai-border-radius);
+  background-color: var(--card-bg);
+  color: var(--foreground);
   margin-right: auto;
   border: 1px solid var(--bot-message-border);
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.06);
-  background: linear-gradient(to bottom right, #FFFFFF, #F8F8FF);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+  /* Add coral accent on the left side */
+  border-left: 3px solid var(--accent);
 }
 
 /* Override background for dark mode */
 html.dark .ai-message {
   background: var(--bot-message-bg);
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-color: var(--bot-message-border);
+  border-left: 3px solid var(--accent);
 }
 
 .ai-message::after {
@@ -808,6 +897,7 @@ html.dark .thinking-box {
   margin-left: 1.25rem;
   margin-top: 0.1rem;
   margin-bottom: 0.2rem;
+  color: inherit; /* Ensure lists inherit text color from parent */
 }
 
 .markdown-content ul {
@@ -821,10 +911,12 @@ html.dark .thinking-box {
 .markdown-content li {
   margin-bottom: 0.1rem;
   padding-left: 0.2rem;
+  color: inherit; /* Ensure list items inherit text color from parent */
 }
 
 .markdown-content li > p {
   margin-bottom: 0.1rem;
+  color: inherit; /* Ensure paragraph text in list items inherits color */
 }
 
 .markdown-content a {
@@ -903,21 +995,32 @@ html.dark .thinking-box {
 @media (max-width: 640px) {
   .message-bubble {
     max-width: 90%;
+    padding: 12px;
+  }
+  
+  .ai-message {
+    border-left-width: 2px;
   }
 }
 
 /* Add styles for user message content */
 .user-message-content {
-  line-height: 1.2;
+  line-height: 1.4;
+  color: var(--user-message-text);
 }
 
 .user-message-content p {
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-message-content p:last-child {
+  margin-bottom: 0;
 }
 
 /* Add compact markdown class for tighter spacing */
 .markdown-content {
   line-height: 1.2;
+  color: inherit; /* Ensure all markdown content inherits text color */
 }
 
 .markdown-content h1 {
@@ -925,6 +1028,7 @@ html.dark .thinking-box {
   font-weight: 700;
   margin-top: 0.5rem;
   margin-bottom: 0.25rem;
+  color: inherit;
 }
 
 .markdown-content h2 {
@@ -932,6 +1036,7 @@ html.dark .thinking-box {
   font-weight: 600;
   margin-top: 0.4rem;
   margin-bottom: 0.2rem;
+  color: inherit;
 }
 
 .markdown-content h3 {
@@ -939,12 +1044,129 @@ html.dark .thinking-box {
   font-weight: 600;
   margin-top: 0.3rem;
   margin-bottom: 0.15rem;
+  color: inherit;
 }
 
 .markdown-content p {
   margin-bottom: 0.2rem;
   line-height: 1.25;
+  color: inherit;
 }
 
-/* Other markdown styles remain unchanged */
+/* Ensure lists have the correct color */
+.markdown-content ul, 
+.markdown-content ol,
+.markdown-content li {
+  color: inherit;
+}
+
+/* Image handling styles */
+.image-preview {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(--background-secondary);
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 16/9;
+}
+
+.image-preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.5rem;
+  opacity: 0;
+}
+
+.image-preview:hover .image-preview-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+
+.remove-button {
+  align-self: flex-end;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.remove-button:hover {
+  background: rgba(255, 0, 0, 0.7);
+}
+
+.image-info {
+  color: white;
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  align-self: flex-start;
+}
+
+/* Message image grid */
+.message-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.message-image {
+  position: relative;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--background-secondary);
+}
+
+.message-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.message-image:hover img {
+  transform: scale(1.05);
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.image-modal-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 1rem;
+}
+
+.image-modal img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.image-modal-info {
+  color: white;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
 

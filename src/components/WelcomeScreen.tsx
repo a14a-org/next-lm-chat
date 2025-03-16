@@ -250,20 +250,20 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartChat }) => {
       setTypedText(fullText);
       setTextIndex(fullText.length);
     }
-  }, [fullText]);
+  }, [fullText, typedText]);
 
   return (
-    <div className="flex flex-col items-center pt-20 md:pt-32 px-4">
+    <div className="flex flex-col items-center pt-10 md:pt-24 px-4">
       <h1
-        className="text-4xl md:text-5xl font-bold mb-8 text-center"
+        className="text-3xl md:text-5xl font-bold mb-4 md:mb-8 text-center"
         style={{ color: theme === 'light' ? '#111827' : '#f3f4f6' }}
       >
         Hi, there!
       </h1>
 
-      <div className="relative text-center mb-16">
+      <div className="relative text-center mb-8 md:mb-16">
         <h2
-          className="text-3xl md:text-4xl font-semibold"
+          className="text-2xl md:text-4xl font-semibold"
           style={{ color: theme === 'light' ? '#374151' : '#d1d5db' }}
         >
           {typedText}
@@ -274,7 +274,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartChat }) => {
         <div className="absolute -bottom-2 left-0 right-0 mx-auto w-24 h-2 rounded-full bg-[#F39880] opacity-50"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 w-full max-w-4xl">
         {selectedPrompts.map((suggestion, index) => (
           <SuggestionCard
             key={index}

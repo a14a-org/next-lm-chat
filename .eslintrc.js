@@ -36,6 +36,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off', // Not needed in Next.js with React 17+
     'react/prop-types': 'off', // Not needed when using TypeScript
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'jsx-a11y/anchor-is-valid': [
