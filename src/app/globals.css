@@ -355,6 +355,12 @@ p {
   color: var(--foreground);
   font-size: 1rem;
   transition: var(--theme-transition);
+  resize: none;
+  overflow: hidden;
+  min-height: 20px;
+  max-height: 200px;
+  line-height: 1.4;
+  font-family: inherit;
 }
 
 .message-input:focus {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FiPaperclip, FiArrowUp } from 'react-icons/fi';
 import { ImageData, processImage, validateImage } from '../utils/image-processing';
 import ImagePreview from './ImagePreview';
@@ -17,6 +17,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled }) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -49,12 +50,28 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled }) 
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    }
+  }, [message]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() || images.length > 0) {
       onSendMessage(message, images.length > 0 ? images : undefined);
       setMessage('');
       setImages([]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
     }
   };
 
@@ -98,13 +115,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled }) 
             disabled={disabled || isProcessing}
           />
 
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             value={message}
             onChange={e => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={isProcessing ? 'Processing image...' : 'Type a message...'}
             className="message-input"
             disabled={disabled || isProcessing}
+            rows={1}
+            style={{ resize: 'none', overflow: 'hidden' }}
           />
 
           <button
