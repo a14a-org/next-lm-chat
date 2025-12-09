@@ -27,27 +27,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-[var(--background-start)] to-[var(--background-end)]`}
+        style={{
+          background:
+            'linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%)',
+        }}
+      >
+        <ThemeProvider>
+          <ParticleBackground />
+          <div className="max-w-4xl mx-auto min-h-screen flex flex-col relative z-10">
+            {children}
+          </div>
+        </ThemeProvider>
         <Script
           src="https://analytics.a14a.org/script.js"
           data-website-id="3ffe85b0-bad7-4843-a33e-a13ee2caa8ac"
           strategy="lazyOnload"
         />
-      </head>
-      <ThemeProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-[var(--background-start)] to-[var(--background-end)]`}
-          style={{
-            background:
-              'linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%)',
-          }}
-        >
-          <ParticleBackground />
-          <div className="max-w-4xl mx-auto min-h-screen flex flex-col relative z-10">
-            {children}
-          </div>
-        </body>
-      </ThemeProvider>
+      </body>
     </html>
   );
 }
