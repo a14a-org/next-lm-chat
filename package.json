@@ -29,7 +29,7 @@
   "packageManager": "pnpm@9.15.9",
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/lodash": "^4.17.16",
+    "@types/lodash": "^4.17.23",
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
