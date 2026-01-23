@@ -1,17 +1,14 @@
-FROM node:20-alpine AS base
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+FROM oven/bun:1 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json bun.lock ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -24,7 +21,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN pnpm build
+RUN bun run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
