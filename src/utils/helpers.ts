@@ -1,11 +1,14 @@
-import { Message } from '../types';
-import { ImageData } from './image-processing';
+import type { Message } from "../types";
+import type { ImageData } from "./image-processing";
 
 /**
  * Generates a unique ID for messages, conversations, etc.
  */
 export const generateId = (): string => {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+	return (
+		Math.random().toString(36).substring(2, 15) +
+		Math.random().toString(36).substring(2, 15)
+	);
 };
 
 /**
@@ -13,8 +16,8 @@ export const generateId = (): string => {
  * @param timestamp - Unix timestamp in milliseconds
  */
 export const formatTime = (timestamp: number): string => {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	const date = new Date(timestamp);
+	return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
 /**
@@ -23,8 +26,8 @@ export const formatTime = (timestamp: number): string => {
  * @param length - Maximum length
  */
 export const truncateString = (str: string, length: number): string => {
-  if (str.length <= length) return str;
-  return str.substring(0, length) + '...';
+	if (str.length <= length) return str;
+	return `${str.substring(0, length)}...`;
 };
 
 /**
@@ -34,15 +37,15 @@ export const truncateString = (str: string, length: number): string => {
  * @param images - Optional images associated with the message
  */
 export const createMessage = (
-  role: 'user' | 'assistant' | 'system',
-  content: string,
-  images?: ImageData[]
+	role: "user" | "assistant" | "system",
+	content: string,
+	images?: ImageData[],
 ): Message => ({
-  id: generateId(),
-  role,
-  content,
-  images,
-  timestamp: Date.now(),
+	id: generateId(),
+	role,
+	content,
+	images,
+	timestamp: Date.now(),
 });
 
 /**
@@ -51,6 +54,6 @@ export const createMessage = (
  * @returns The content with think tags and their content removed
  */
 export const stripThinkTags = (content: string): string => {
-  // Use regex to remove <think>...</think> and all content between them
-  return content.replace(/<think>[\s\S]*?<\/think>/g, '');
+	// Use regex to remove <think>...</think> and all content between them
+	return content.replace(/<think>[\s\S]*?<\/think>/g, "");
 };

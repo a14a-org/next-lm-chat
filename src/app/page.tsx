@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import ChatContainer from '../components/ChatContainer';
+import ChatContainer from "../components/ChatContainer";
 
 export default function Home() {
-  return (
-    <main className="flex-1 flex overflow-hidden">
-      <ChatContainer />
-    </main>
-  );
+	return (
+		<main className="flex-1 flex overflow-hidden">
+			<ChatContainer />
+		</main>
+	);
 }
