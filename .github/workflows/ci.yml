@@ -1,29 +1,35 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main, develop]
   push:
     branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  merge_group:
 
+# contents: write is required only for the Dependabot lockfile-regen commit below.
 permissions:
   contents: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref || github.ref }}
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
+      # Dependabot only updates package.json, not bun.lock. Regenerate the
+      # lockfile on Dependabot PRs so `--frozen-lockfile` does not drift.
       - name: Install dependencies (regen lockfile for Dependabot)
         run: |
           if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
@@ -31,6 +37,7 @@ jobs:
           else
             bun install --frozen-lockfile
           fi
+
       - name: Commit regenerated lockfile (Dependabot only)
         if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
         run: |
@@ -46,9 +53,9 @@ jobs:
         run: bun run lint
 
       - name: Type check
-        run: bunx --bun tsc --noEmit
+        run: bun run typecheck
 
-      - name: Build application
+      - name: Build
         run: bun run build
 
       - name: Verify build artifacts
@@ -58,3 +65,17 @@ jobs:
             exit 1
           fi
           echo "Build successful"
+
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
+
+      - name: Smoke tests
+        run: bun run test:smoke
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
