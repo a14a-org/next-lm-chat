@@ -21,6 +21,14 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Sentry/GlitchTip build-time configuration.
+# NEXT_PUBLIC_SENTRY_DSN must be present at build time so it is inlined into the
+# client bundle; SENTRY_AUTH_TOKEN (optional) enables source-map upload.
+ARG NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
 RUN bun run build
 
 # Production image, copy all the files and run next
