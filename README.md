@@ -42,6 +42,8 @@ Create a `.env.local` file in the root directory:
 | `LM_STUDIO_API_URL` | Base URL for the LLM API | No | `https://example.com/v1` |
 | `NEXT_PUBLIC_APP_NAME` | Application name displayed in UI | No | `Next LM Chat` |
 | `NEXT_PUBLIC_DEFAULT_MODEL` | Default model to use | No | `local-model` |
+| `NEXT_PUBLIC_CHILITRACK_SCRIPT_URL` | ChiliTrack collector script URL | No | `https://ingest.chilitrack.com/script.js` |
+| `NEXT_PUBLIC_CHILITRACK_WEBSITE_ID` | Public ChiliTrack website ID | No | Production `chat.a14a.org` site |
 
 ### Running the App
 

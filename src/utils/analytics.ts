@@ -1,28 +1,102 @@
 interface AnalyticsEvent {
 	name: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	data?: Record<string, any>;
+	data?: Record<string, unknown>;
 }
 
-// Type declaration for umami window object
+type AnalyticsClient = {
+	track: (event: string, data?: Record<string, unknown>) => unknown;
+};
+
+type AnalyticsProvider = "umami" | "chili";
+type ProviderStatus = "pending" | "ready" | "failed";
+type PendingEvent = {
+	event: AnalyticsEvent;
+	deliveredProviders: Set<AnalyticsProvider>;
+	deliveredClients: Set<AnalyticsClient>;
+};
+
+const providerStatus: Record<AnalyticsProvider, ProviderStatus> = {
+	umami: "pending",
+	chili: "pending",
+};
+const pendingEvents: PendingEvent[] = [];
+const MAX_PENDING_EVENTS = 100;
+
 declare global {
 	interface Window {
-		umami?: {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			track: (event: string, data?: Record<string, any>) => void;
-		};
+		umami?: AnalyticsClient;
+		chili?: AnalyticsClient;
 	}
 }
 
-// Helper function to track events
-export const trackEvent = ({ name, data }: AnalyticsEvent) => {
-	try {
-		if (typeof window !== "undefined" && window.umami) {
-			window.umami.track(name, data);
+const analyticsClients = (): Record<
+	AnalyticsProvider,
+	AnalyticsClient | undefined
+> => ({
+	umami: window.umami,
+	chili: window.chili,
+});
+
+const deliver = (pending: PendingEvent) => {
+	const clients = analyticsClients();
+	let hasPendingProvider = false;
+	for (const provider of ["umami", "chili"] as const) {
+		if (
+			pending.deliveredProviders.has(provider) ||
+			providerStatus[provider] === "failed"
+		) {
+			continue;
 		}
-	} catch (error) {
-		console.error("Error tracking event:", error);
+		if (providerStatus[provider] === "pending") {
+			hasPendingProvider = true;
+			continue;
+		}
+		const client = clients[provider];
+		if (!client?.track) {
+			hasPendingProvider = true;
+			continue;
+		}
+		if (pending.deliveredClients.has(client)) {
+			pending.deliveredProviders.add(provider);
+			continue;
+		}
+		try {
+			void client.track(pending.event.name, pending.event.data);
+		} catch {
+			// Analytics must never interrupt the chat flow.
+		}
+		pending.deliveredClients.add(client);
+		pending.deliveredProviders.add(provider);
 	}
+	return !hasPendingProvider;
+};
+
+export const flushAnalyticsQueue = () => {
+	if (typeof window === "undefined") return;
+	while (pendingEvents.length > 0) {
+		if (!deliver(pendingEvents[0])) return;
+		pendingEvents.shift();
+	}
+};
+
+export const settleAnalyticsProvider = (
+	provider: AnalyticsProvider,
+	status: ProviderStatus,
+) => {
+	providerStatus[provider] = status;
+	flushAnalyticsQueue();
+};
+
+export const trackEvent = (event: AnalyticsEvent) => {
+	if (typeof window === "undefined") return;
+	const pending = {
+		event,
+		deliveredProviders: new Set<AnalyticsProvider>(),
+		deliveredClients: new Set<AnalyticsClient>(),
+	};
+	if (deliver(pending)) return;
+	if (pendingEvents.length === MAX_PENDING_EVENTS) pendingEvents.shift();
+	pendingEvents.push(pending);
 };
 
 // Message events
@@ -56,8 +130,7 @@ export const trackSettingsOpened = () => {
 	trackEvent({ name: "settings_opened" });
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const trackSettingsChanged = (setting: string, value: any) => {
+export const trackSettingsChanged = (setting: string, value: unknown) => {
 	trackEvent({
 		name: "settings_changed",
 		data: {
