@@ -40,3 +40,30 @@ test("delivers once per healthy provider as scripts settle independently", () =>
 
 	delete (globalThis as { window?: Window }).window;
 });
+
+test("isolates rejected provider results and continues fan-out", () => {
+	const calls: string[] = [];
+	let rejectionHandled = false;
+	Object.defineProperty(globalThis, "window", {
+		configurable: true,
+		value: {
+			umami: {
+				track: () => ({
+					catch(handler: () => unknown) {
+						rejectionHandled = true;
+						return handler();
+					},
+				}),
+			},
+			chili: { track: () => calls.push("chili") },
+		},
+	});
+
+	settleAnalyticsProvider("umami", "ready");
+	settleAnalyticsProvider("chili", "ready");
+	trackEvent({ name: "safe" });
+
+	expect(rejectionHandled).toBe(true);
+	expect(calls).toEqual(["chili"]);
+	delete (globalThis as { window?: Window }).window;
+});

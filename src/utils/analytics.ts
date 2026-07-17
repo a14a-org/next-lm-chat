@@ -61,7 +61,15 @@ const deliver = (pending: PendingEvent) => {
 			continue;
 		}
 		try {
-			void client.track(pending.event.name, pending.event.data);
+			const result = client.track(pending.event.name, pending.event.data);
+			if (
+				result &&
+				typeof result === "object" &&
+				"catch" in result &&
+				typeof result.catch === "function"
+			) {
+				void result.catch(() => undefined);
+			}
 		} catch {
 			// Analytics must never interrupt the chat flow.
 		}
