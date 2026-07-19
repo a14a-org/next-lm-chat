@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
+import AnalyticsScripts from "../components/AnalyticsScripts";
 import ParticleBackground from "../components/ParticleBackground";
 import { ThemeProvider } from "../context/ThemeContext";
 
@@ -40,11 +40,7 @@ export default function RootLayout({
 						{children}
 					</div>
 				</ThemeProvider>
-				<Script
-					src="https://analytics.a14a.org/script.js"
-					data-website-id="3ffe85b0-bad7-4843-a33e-a13ee2caa8ac"
-					strategy="lazyOnload"
-				/>
+				<AnalyticsScripts />
 			</body>
 		</html>
 	);
