@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"@sentry/nextjs": "^10.71.0",
-		"axios": "^1.19.0",
+		"axios": "^1.20.0",
 		"next": "^16.3.3",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
