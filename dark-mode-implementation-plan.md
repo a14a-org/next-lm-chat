@@ -79,61 +79,69 @@ This document outlines the plan to implement a dark mode toggle feature accessib
 
 ```tsx
 // src/context/ThemeContext.tsx
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+	ReactNode,
+} from "react";
 
-type Theme = 'light' | 'dark';
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
+	theme: Theme;
+	toggleTheme: () => void;
+	setTheme: (theme: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+	const [theme, setTheme] = useState<Theme>("light");
 
-  useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem('theme') as Theme;
+	useEffect(() => {
+		// Load theme from localStorage on mount
+		const savedTheme = localStorage.getItem("theme") as Theme;
 
-    // Check if user has saved preference
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
-    }
-  }, []);
+		// Check if user has saved preference
+		if (savedTheme) {
+			setTheme(savedTheme);
+		} else {
+			// Check system preference
+			const prefersDark = window.matchMedia(
+				"(prefers-color-scheme: dark)",
+			).matches;
+			setTheme(prefersDark ? "dark" : "light");
+		}
+	}, []);
 
-  useEffect(() => {
-    // Save theme to localStorage whenever it changes
-    localStorage.setItem('theme', theme);
+	useEffect(() => {
+		// Save theme to localStorage whenever it changes
+		localStorage.setItem("theme", theme);
 
-    // Apply theme class to document
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-  }, [theme]);
+		// Apply theme class to document
+		document.documentElement.classList.remove("light", "dark");
+		document.documentElement.classList.add(theme);
+	}, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
+	const toggleTheme = () => {
+		setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+	};
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+	return (
+		<ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+			{children}
+		</ThemeContext.Provider>
+	);
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+	const context = useContext(ThemeContext);
+	if (context === undefined) {
+		throw new Error("useTheme must be used within a ThemeProvider");
+	}
+	return context;
 }
 ```
 
@@ -143,57 +151,62 @@ export function useTheme() {
 /* In globals.css */
 
 :root {
-  /* Light mode colors (default) */
-  --background-start: #fff0f5;
-  --background-end: #f5f0ff;
-  --foreground: #333333;
-  --accent: #f39880;
-  --accent-soft: rgba(243, 152, 128, 0.2);
-  --purple-soft: rgba(138, 116, 191, 0.12);
-  --purple-medium: #8a74bf;
-  --ui-light: #f9f9f9;
-  --ui-dark: #333333;
+	/* Light mode colors (default) */
+	--background-start: #fff0f5;
+	--background-end: #f5f0ff;
+	--foreground: #333333;
+	--accent: #f39880;
+	--accent-soft: rgba(243, 152, 128, 0.2);
+	--purple-soft: rgba(138, 116, 191, 0.12);
+	--purple-medium: #8a74bf;
+	--ui-light: #f9f9f9;
+	--ui-dark: #333333;
 
-  /* Component colors - light theme */
-  --card-bg: rgba(255, 255, 255, 1);
-  --user-message-bg: rgba(147, 112, 219, 0.5);
-  --user-message-text: #ffffff;
-  --user-message-border: rgba(147, 112, 219, 0.6);
-  --bot-message-bg: #ffffff;
-  --bot-message-text: #333333;
-  --bot-message-border: rgba(138, 116, 191, 0.2);
+	/* Component colors - light theme */
+	--card-bg: rgba(255, 255, 255, 1);
+	--user-message-bg: rgba(147, 112, 219, 0.5);
+	--user-message-text: #ffffff;
+	--user-message-border: rgba(147, 112, 219, 0.6);
+	--bot-message-bg: #ffffff;
+	--bot-message-text: #333333;
+	--bot-message-border: rgba(138, 116, 191, 0.2);
 
-  /* Transition for theme switching */
-  --theme-transition:
-    background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+	/* Transition for theme switching */
+	--theme-transition:
+		background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
 /* Dark mode theme */
 html.dark {
-  --background-start: #1a1a2e;
-  --background-end: #16213e;
-  --foreground: #f1f1f1;
-  --accent: #f39880;
-  --accent-soft: rgba(243, 152, 128, 0.3);
-  --purple-soft: rgba(138, 116, 191, 0.25);
-  --purple-medium: #9d86d9;
-  --ui-light: #2a2a3a;
-  --ui-dark: #e1e1e1;
+	--background-start: #1a1a2e;
+	--background-end: #16213e;
+	--foreground: #f1f1f1;
+	--accent: #f39880;
+	--accent-soft: rgba(243, 152, 128, 0.3);
+	--purple-soft: rgba(138, 116, 191, 0.25);
+	--purple-medium: #9d86d9;
+	--ui-light: #2a2a3a;
+	--ui-dark: #e1e1e1;
 
-  /* Component colors - dark theme */
-  --card-bg: rgba(42, 42, 58, 0.8);
-  --user-message-bg: rgba(147, 112, 219, 0.6);
-  --user-message-text: #ffffff;
-  --user-message-border: rgba(147, 112, 219, 0.7);
-  --bot-message-bg: rgba(30, 30, 42, 1);
-  --bot-message-text: #f1f1f1;
-  --bot-message-border: rgba(138, 116, 191, 0.3);
+	/* Component colors - dark theme */
+	--card-bg: rgba(42, 42, 58, 0.8);
+	--user-message-bg: rgba(147, 112, 219, 0.6);
+	--user-message-text: #ffffff;
+	--user-message-border: rgba(147, 112, 219, 0.7);
+	--bot-message-bg: rgba(30, 30, 42, 1);
+	--bot-message-text: #f1f1f1;
+	--bot-message-border: rgba(138, 116, 191, 0.3);
 }
 
 body {
-  color: var(--foreground);
-  background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
-  transition: var(--theme-transition);
+	color: var(--foreground);
+	background: linear-gradient(
+		135deg,
+		var(--background-start) 0%,
+		var(--background-end) 100%
+	);
+	transition: var(--theme-transition);
 }
 ```
 
@@ -202,26 +215,32 @@ body {
 ```tsx
 // Add to SettingsDropdown.tsx
 
-import { useTheme } from '../context/ThemeContext';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from "../context/ThemeContext";
+import { FiSun, FiMoon } from "react-icons/fi";
 
 // Inside SettingsDropdown component
 const { theme, toggleTheme } = useTheme();
 
 // Add this inside the dropdown panel
 <div className="mb-6">
-  <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-3">Theme</label>
-  <div className="flex items-center justify-between">
-    <span className="text-sm text-gray-600 dark:text-gray-400">
-      {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
-    </span>
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-    >
-      {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
-    </button>
-  </div>
+	<label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-3">
+		Theme
+	</label>
+	<div className="flex items-center justify-between">
+		<span className="text-sm text-gray-600 dark:text-gray-400">
+			{theme === "light" ? "Light Mode" : "Dark Mode"}
+		</span>
+		<button
+			onClick={toggleTheme}
+			className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+		>
+			{theme === "light" ? (
+				<FiMoon className="w-5 h-5" />
+			) : (
+				<FiSun className="w-5 h-5" />
+			)}
+		</button>
+	</div>
 </div>;
 ```
 

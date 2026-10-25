@@ -36,14 +36,14 @@ bun install
 
 Create a `.env.local` file in the root directory:
 
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `LM_STUDIO_API_KEY` | API key for authentication | Yes | - |
-| `LM_STUDIO_API_URL` | Base URL for the LLM API | No | `https://example.com/v1` |
-| `NEXT_PUBLIC_APP_NAME` | Application name displayed in UI | No | `Next LM Chat` |
-| `NEXT_PUBLIC_DEFAULT_MODEL` | Default model to use | No | `local-model` |
-| `NEXT_PUBLIC_CHILITRACK_SCRIPT_URL` | ChiliTrack collector script URL | No | `https://ingest.chilitrack.com/script.js` |
-| `NEXT_PUBLIC_CHILITRACK_WEBSITE_ID` | Public ChiliTrack website ID | No | Production `chat.a14a.org` site |
+| Variable                            | Description                      | Required | Default                                   |
+| ----------------------------------- | -------------------------------- | -------- | ----------------------------------------- |
+| `LM_STUDIO_API_KEY`                 | API key for authentication       | Yes      | -                                         |
+| `LM_STUDIO_API_URL`                 | Base URL for the LLM API         | No       | `https://example.com/v1`                  |
+| `NEXT_PUBLIC_APP_NAME`              | Application name displayed in UI | No       | `Next LM Chat`                            |
+| `NEXT_PUBLIC_DEFAULT_MODEL`         | Default model to use             | No       | `local-model`                             |
+| `NEXT_PUBLIC_CHILITRACK_SCRIPT_URL` | ChiliTrack collector script URL  | No       | `https://ingest.chilitrack.com/script.js` |
+| `NEXT_PUBLIC_CHILITRACK_WEBSITE_ID` | Public ChiliTrack website ID     | No       | Production `chat.a14a.org` site           |
 
 ### Running the App
 
@@ -55,14 +55,14 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `bun dev` | Start development server with Turbopack |
-| `bun run build` | Build for production |
-| `bun start` | Start production server |
-| `bun run lint` | Run Biome linting |
-| `bun run lint:fix` | Fix linting issues |
-| `bun run format` | Format code with Biome |
+| Script             | Description                             |
+| ------------------ | --------------------------------------- |
+| `bun dev`          | Start development server with Turbopack |
+| `bun run build`    | Build for production                    |
+| `bun start`        | Start production server                 |
+| `bun run lint`     | Run Biome linting                       |
+| `bun run lint:fix` | Fix linting issues                      |
+| `bun run format`   | Format code with Biome                  |
 
 ## License
 
